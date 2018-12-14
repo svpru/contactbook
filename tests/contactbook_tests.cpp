@@ -1,10 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <eosio/testing/tester.hpp>
 #include <eosio/chain/abi_serializer.hpp>
-
-
 #include "Runtime/Runtime.h"
-
 #include <fc/variant_object.hpp>
 
 #include "contracts.hpp"
@@ -20,26 +17,13 @@ using namespace std;
 class contactbook_tester : public tester {
 public:
     contactbook_tester() {
-        produce_blocks( 2 );
+        produce_block();
 
-        create_account( N(contactbook));
-        produce_blocks(1);
+        create_accounts( {  N(contactbook),N(testacc), N(sriaccount11) } );
+        produce_block();
 
         set_code( N(contactbook), contracts::contactbook_wasm() );
         set_abi( N(contactbook), contracts::contactbook_abi().data() );
-
-        create_account( N(testacc));
-        produce_blocks(1);
-        set_code( N(testacc), contracts::contactbook_wasm() );
-        set_abi( N(testacc), contracts::contactbook_abi().data() );
-
-        create_account( N(sriaccount11));
-        produce_blocks(1);
-        set_code( N(sriaccount11), contracts::contactbook_wasm() );
-        set_abi( N(sriaccount11), contracts::contactbook_abi().data() );
-
-        produce_blocks(3); 
-        BOOST_TEST_MESSAGE( "Accoounts created");
     }
 
    void init_abi_ser(abi_serializer& abi_ser, account_name name) {
@@ -50,108 +34,69 @@ public:
         abi_ser.set_abi(abi, abi_serializer_max_time);
     }
 
+    bool get_person( person_t& person, uint64_t user ) {
+        return get_table_entry(person, N(contactbook), N(contactbook), N(details), user, false);   
+    }
 };
-
 
 BOOST_AUTO_TEST_SUITE(contactbook_tests)
 
-
     BOOST_FIXTURE_TEST_CASE( upsert_tests, contactbook_tester ) try {
-        push_action( N(contactbook), N(upsert), N(testacc), mvo()
-                ("user", "testacc") 
-                ("first_name", "AAA") 
-                ("last_name", "aaa")
-                ("ph_num", "01000001111")
-                ("email","AAAaaa@gmail.com")            
-                ("status", false)
-        );
+        
+        //============// UPSERT
+
+        auto person_i_1 = mvo()
+            ("user", "testacc") 
+            ("first_name", "AAA") 
+            ("last_name", "aaa")
+            ("ph_num", "01000001111")
+            ("email","AAAaaa@gmail.com")            
+            ("status", false);
+
+        push_action( N(contactbook), N(upsert), N(testacc), person_i_1);
+        produce_block();
+
+        person_t person_o_1;
+        get_person( person_o_1, N(testacc));
+        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_1));
+
+        //==========// MODIFY
+
+        auto person_i_2 = mvo()
+            ("user", "sriaccount11") 
+            ("first_name", "AAA") 
+            ("last_name", "aaa")
+            ("ph_num", "01089201111")
+            ("email","AAAaaa@yahoomail.com")            
+            ("status", false);
+
+        push_action( N(contactbook), N(upsert), N(sriaccount11), person_i_2);
         produce_blocks(1);
 
-        person_t person1;
+        person_t person_o_2;
+        get_person( person_o_2, N(sriaccount11));
+        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_2));
 
-        BOOST_TEST_MESSAGE("person 1 created");
-    
-        push_action( N(contactbook), N(upsert), N(testacc), mvo()
-                ("user", "testacc") 
-                ("first_name", "AAA") 
-                ("last_name", "aaa")
-                ("ph_num", "01000001111")
-                ("email","AAAaaa@yahoomail.com")            // different email.
-                ("status", false)
-        );
-        BOOST_TEST_MESSAGE( "New Record Upserted" );
+        auto person_i_3 = mvo()
+            ("user", "sriaccount11") 
+            ("first_name", "AAA") 
+            ("last_name", "aaa")
+            ("ph_num", "01089201111")
+            ("email","AAAaaa@gmail.com")            
+            ("status", false);
 
-        person_t person2;
-    
-        BOOST_TEST_MESSAGE("person 2 created");
-            
-        if ( person2.key == person1.key)  BOOST_TEST_MESSAGE("Successfully Existed Record Modified");
-
-    }FC_LOG_AND_RETHROW()
-
-
-  //===========================================================================================================//
-    //Emplacing a new Record.
-
-    BOOST_FIXTURE_TEST_CASE( upsert_tests1, contactbook_tester ) try {
-        push_action( N(contactbook), N(upsert), N(testacc), mvo()
-                ("user", "testacc") 
-                ("first_name", "AAA") 
-                ("last_name", "aaa")
-                ("ph_num", "01000001111")
-                ("email","AAAaaa@gmail.com")            
-                ("status", false)
-            );
-            BOOST_TEST_MESSAGE( "Record Upserted");
+        push_action( N(contactbook), N(upsert), N(sriaccount11), person_i_3);
         produce_blocks(1);
 
-        person_t person1;
+        person_t person_o_3;
+        get_person( person_o_3, N(sriaccount11));
+        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_3));
 
-        BOOST_TEST_MESSAGE("person 1 created");
-    
-    
-        push_action( N(contactbook), N(upsert), N(sriaccount11), mvo()
-                ("user", "sriaccount11") 
-                ("first_name", "SSS") 
-                ("last_name", "sss")
-                ("ph_num", "01000003333")
-                ("email","SSSsss@gmail.com")
-                ("status", false)
-            );
+        //==========// ERASE
 
-        BOOST_TEST_MESSAGE( "New Record Userted" );
-
-        person_t person2;
-    
-        BOOST_TEST_MESSAGE("person 2 created");
-            
-        if ( person2.key != person1.key)    BOOST_TEST_MESSAGE("Successfully New Record Emplaced"); 
-    
-    
-    }FC_LOG_AND_RETHROW()
-
-//===============================================================================================//
-
-    // Erasing Person Record.
-    
-    BOOST_FIXTURE_TEST_CASE( erase_tests, contactbook_tester ) try { 
-
-        push_action( N(contactbook), N(upsert), N(testacc), mvo()
-                ("user", "testacc") 
-                ("first_name", "AAA") 
-                ("last_name", "aaa")
-                ("ph_num", "01000001111")
-                ("email","AAAaaa@gmail.com")            
-                ("status", false)
-            );
-        produce_blocks(1); 
-
-        push_action( N(contactbook), N(erase), N(testacc), mvo()
-            ("user", "testacc")
-            );
+        push_action( N(contactbook), N(erase), N(testacc), mvo() ("user", "testacc") );
         produce_blocks(1);
-        BOOST_TEST_MESSAGE("Successfully Existed Record Erased");
-
-    }FC_LOG_AND_RETHROW()
+    
+    }FC_LOG_AND_RETHROW() 
 
 BOOST_AUTO_TEST_SUITE_END()
