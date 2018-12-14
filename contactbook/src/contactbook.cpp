@@ -81,7 +81,7 @@ private:
     uint64_t primary_key() const { return key.value; }
   };
 
-  typedef eosio::multi_index<"details"_n, person> contact_index;
+  typedef eosio::multi_index<"people"_n, person> contact_index;
 
   void send_summary(name user, std::string message) {
     action(

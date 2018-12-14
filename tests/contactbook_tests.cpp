@@ -35,7 +35,7 @@ public:
     }
 
     bool get_person( person_t& person, uint64_t user ) {
-        return get_table_entry(person, N(contactbook), N(contactbook), N(details), user, false);   
+        return get_table_entry(person, N(contactbook), N(contactbook), N(people), user, false);   
     }
 };
 
