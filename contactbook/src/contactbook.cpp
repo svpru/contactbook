@@ -29,7 +29,6 @@ public:
        row.last_name = last_name;
        row.ph_num = ph_num;
        row.email = email;
-       
       });
       send_summary(user, "successfully emplaced record to contactbook");
     }
@@ -44,7 +43,6 @@ public:
         row.last_name = last_name;
         row.ph_num = ph_num;
         row.email = email;
-        
       });
       send_summary(user, "successfully modified record to contactbook");
     }
@@ -77,7 +75,6 @@ private:
     std::string last_name;
     std::string ph_num;
     std::string email;
-    
     uint64_t primary_key() const { return key.value; }
   };
 

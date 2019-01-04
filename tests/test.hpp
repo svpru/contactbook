@@ -18,13 +18,14 @@ using namespace fc;
 using mvo = fc::mutable_variant_object;
 
 struct person_t {
-    name key;
+    name user;
     string first_name;
     string last_name;
     string ph_num;
     string email;
-    bool status;
-    uint64_t primary_key() const { return key; }
+    uint64_t primary_key() const { return user; }
 };
-FC_REFLECT( person_t, (key)(first_name)(last_name)(ph_num)(email));
+
+
+FC_REFLECT( person_t, (user)(first_name)(last_name)(ph_num)(email));
 
