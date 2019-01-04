@@ -12,9 +12,6 @@ public:
   contactbook(name receiver, name code,  datastream<const char*> ds): contract(receiver, code, ds) {}
 
   [[eosio::action]]
-  
-  // insert a new contact 
-
   void upsert(name user, std::string first_name, std::string last_name, std::string ph_num, std::string email) {
     require_auth( user );
 
@@ -23,6 +20,7 @@ public:
     auto iterator = contacts.find(user.value);
     if( iterator == contacts.end() )
     {
+      // emplace a new contact 
       contacts.emplace(user, [&]( auto& row ) {
        row.key = user;
        row.first_name = first_name;
@@ -36,7 +34,6 @@ public:
       std::string changes;
 
       // modify the contact
-      
       contacts.modify(iterator, user, [&]( auto& row ) {
         row.key = user;
         row.first_name = first_name;
@@ -48,10 +45,8 @@ public:
     }
   }
 
-  [[eosio::action]]
-  
   //erase an existing contact
-
+  [[eosio::action]]
   void erase(name user) {
     require_auth(user);
     contact_index contacts(_self, _code.value);
@@ -68,7 +63,6 @@ public:
   }
 
 private:
-  
   struct [[eosio::table]] person {
     name key;
     std::string first_name;
@@ -90,5 +84,4 @@ private:
   };
 
 };
-
 EOSIO_DISPATCH( contactbook, (upsert)(notify)(erase) )    

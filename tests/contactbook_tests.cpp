@@ -6,7 +6,6 @@
 #include <fc/variant_object.hpp>
 #define BOOST_TEST_MODULE boost_test_strings
 
-
 #include "contracts.hpp"
 #include "test.hpp"
 
@@ -44,9 +43,9 @@ public:
 
 BOOST_AUTO_TEST_SUITE(contactbook_tests)
 
-    BOOST_FIXTURE_TEST_CASE( upsert_tests, contactbook_tester ) try {
+    BOOST_FIXTURE_TEST_CASE( insert_of_upsert_tests, contactbook_tester ) try {
         
-        //============// UPSERT
+        //============// INSERT
 
         auto person_i_1 = mvo()
             ("user", "testacc") 
@@ -60,8 +59,8 @@ BOOST_AUTO_TEST_SUITE(contactbook_tests)
 
         person_t person_o_1;
         get_person( person_o_1, N(testacc));
-        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_i_1));
-        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_1));
+        //BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_i_1));
+        //BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_1));
         
         // ========= to check and compare the input person and output person
         
@@ -74,59 +73,71 @@ BOOST_AUTO_TEST_SUITE(contactbook_tests)
             BOOST_CHECK_EQUAL(*ov, *iv);
         }
         
+    }FC_LOG_AND_RETHROW() 
+
+    BOOST_FIXTURE_TEST_CASE( modify_of_upsert_tests, contactbook_tester ) try {
+
         //==========// MODIFY
 
-        auto person_i_2 = mvo()
+        auto person_i_1 = mvo()
             ("user", "sriaccount11") 
             ("first_name", "AAA") 
             ("last_name", "aaa")
             ("ph_num", "01089201111")
             ("email","AAAaaa@yahoomail.com");
 
+        push_action( N(contactbook), N(upsert), N(sriaccount11), person_i_1);
+        produce_blocks(1);
+
+        person_t person_o_1;
+        get_person( person_o_1, N(sriaccount11));
+        //BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_i_1));
+        //BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_1));
+        
+        auto person_i_2 = mvo()
+            ("user", "sriaccount11") 
+            ("first_name", "AAA2") 
+            ("last_name", "aaa2")
+            ("ph_num", "01089201112")
+            ("email","AAAaaa2@gmail.com");
+
         push_action( N(contactbook), N(upsert), N(sriaccount11), person_i_2);
         produce_blocks(1);
 
         person_t person_o_2;
         get_person( person_o_2, N(sriaccount11));
-        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_i_2));
-        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_2));
+        //BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_i_2));
+        //BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_2));
 
-        po = variant(person_o_2).get_object();
+        auto po1 = variant(person_o_1).get_object();
+        auto po2 = variant(person_o_2).get_object();
         for (auto v : person_i_2) {
             auto key = v.key();
-            auto iv = person_i_2.find(key);
-            auto ov = po.find(key);
-            BOOST_TEST_MESSAGE("comparing "<< key);
-            BOOST_CHECK_EQUAL(*ov, *iv);
+            auto iv = po1.find(key);
+            auto ov = po2.find(key);
+            BOOST_TEST_MESSAGE("comparing "<< key);            
+           if(key == "user") 
+            BOOST_CHECK(*ov==*iv);
+           else 
+            BOOST_CHECK(*ov!=*iv);
         }
         
+    }FC_LOG_AND_RETHROW() 
 
-        auto person_i_3 = mvo()
-            ("user", "sriaccount11") 
-            ("first_name", "AAA") 
-            ("last_name", "aaa")
-            ("ph_num", "01089201111")
-            ("email","AAAaaa@gmail.com");
-
-        push_action( N(contactbook), N(upsert), N(sriaccount11), person_i_3);
-        produce_blocks(1);
-
-        person_t person_o_3;
-        get_person( person_o_3, N(sriaccount11));
-        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_i_3));
-        BOOST_TEST_MESSAGE( fc::json::to_pretty_string(person_o_3));
-
-        po = variant(person_o_3).get_object();
-        for (auto v : person_i_3) {
-            auto key = v.key();
-            auto iv = person_i_3.find(key);
-            auto ov = po.find(key);
-            BOOST_TEST_MESSAGE("comparing "<< key);
-            BOOST_CHECK_EQUAL(*ov, *iv);
-        }
+    BOOST_FIXTURE_TEST_CASE( erase_of_upsert_tests, contactbook_tester ) try {
 
         //==========// ERASE
-        
+
+        auto person_i_1 = mvo()
+            ("user", "testacc") 
+            ("first_name", "AAA") 
+            ("last_name", "aaa")
+            ("ph_num", "01000001111")
+            ("email","AAAaaa@gmail.com");
+
+        push_action( N(contactbook), N(upsert), N(testacc), person_i_1);
+        produce_block();
+
         push_action( N(contactbook), N(erase), N(testacc), mvo()
          ("user", "testacc"));
         

@@ -1,14 +1,25 @@
 # contactbook
-## version: 1
+This basically is a contract which takes an account holder’s contact details.
+
+## version: 1.0
 
 Dependencies:
-* [Eosio cdt Version : 1.4.1](https://github.com/eosio/eosio.cdt)
-* [Eosio Version : 1.4.4](https://github.com/eosio/eo)
+* [eosio.cdt version : 1.4.1](https://github.com/eosio/eosio.cdt)
+  * eosio.cdt includes libraries and build modules
+* [eosio version : 1.4.4](https://github.com/EOSIO/eos)
+  * eosio includes __unittest__ modules. unittest used boost test framework.
 *  Boost version: 1.67.0
 
+Prior to run the contract: 
+* First,ensure that your system is updated with the appropriate dependencies as mentioned above.
+* __eosio :__ eosio is built using ```./eosio_build.sh```  and installed using ``` sudo ./eosio_install.sh``` in __eos__ directory
+* __eosio.cdt :__  eosio is built using ```./build.sh```  and installed using ``` sudo ./install.sh``` in __eosio.cdt__ directory 
 
-To build the unit tests:
-* Run ./build.sh 
+To build the contract or unittests:
+* Then run ```./build.sh ``` in ```contactbook``` directory.
+
+To run the unittests:
+* ```./build/tests/unit_test --log_level=all``` in ```contactbook``` directory.
 
 After build:
 * The unit tests executable is placed in the _build/tests_ and is named __unit_test__.
@@ -32,9 +43,8 @@ Actions:
     * modify  : modifies an exited account of the table's multi-index "people"
     * erase   : erases an existed account of the table's multi_index "people"
 
-Table name:
+table name:
 * person
 
-Multi index of the table name:
+multi_index table name:
 * people
-
