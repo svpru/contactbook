@@ -27,7 +27,7 @@ After build:
 * Finally, simply use __cleos__ to _set contract_ by pointing to the previously mentioned directory.
 
 Summary:
-  This contract is made as am simple demonstartion for begginers. This a similar example like addressbook explained in eosio Developer portal.
+  This contract is made as am simple demonstration for begginers. This a similar example like addressbook explained in eosio Developer portal.
 
 Account Parameters:
 * Account name (reference Key) as "user"
@@ -39,12 +39,9 @@ Account Parameters:
 Actions:
 * This contract has 3 actions.
 
-    * emplace : emplace a new account into a table "person".
-    * modify  : modifies an exited account of the table's multi-index "people"
-    * erase   : erases an existed account of the table's multi_index "people"
-
-table name:
-* person
+    * emplace : emplace a new account into a table.
+    * modify  : modifies an exited account of the table
+    * erase   : erases an existed account of the table
 
 multi_index table name:
 * people
