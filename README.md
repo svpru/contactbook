@@ -1,12 +1,12 @@
 # contactbook
 This basically is a contract which takes an account holder’s contact details.
 
-## version: 1.0
+## version: 1.1
 
 Dependencies:
-* [eosio.cdt version : 1.4.1](https://github.com/eosio/eosio.cdt)
+* [eosio.cdt version : 1.5.0](https://github.com/eosio/eosio.cdt)
   * eosio.cdt includes libraries and build modules
-* [eosio version : 1.4.4](https://github.com/EOSIO/eos)
+* [eosio version : 1.6.0](https://github.com/EOSIO/eos)
   * eosio includes __unittest__ modules. unittest used boost test framework.
 *  Boost version: 1.67.0
 

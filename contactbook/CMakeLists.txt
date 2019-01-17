@@ -1,4 +1,4 @@
-add_contract(contactbook contactbook ${CMAKE_CURRENT_SOURCE_DIR}/src/contactbook.cpp)
+add_contract(contactbook contactbook ${CMAKE_CURRENT_SOURCE_DIR}/contactbook.cpp)
 target_include_directories(contactbook.wasm
    PUBLIC
    ${CMAKE_CURRENT_SOURCE_DIR}/include)
